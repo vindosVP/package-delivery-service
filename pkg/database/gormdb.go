@@ -1,17 +1,16 @@
 package database
 
 import (
+	"clean-architecture-service/config"
 	"clean-architecture-service/internal/entity"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-type GormDB struct {
-	db *gorm.DB
-}
+func NewGorm(cfg config.DB) (*gorm.DB, error) {
 
-func NewGorm(dns string) (*GormDB, error) {
+	dns := GenerateGormDNS(cfg)
 
 	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
 	if err != nil {
@@ -21,15 +20,23 @@ func NewGorm(dns string) (*GormDB, error) {
 	if err := db.AutoMigrate(&entity.User{}); err != nil {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
-	if err := db.AutoMigrate(&entity.User{}); err != nil {
+	if err := db.AutoMigrate(&entity.Token{}); err != nil {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
-	if err := db.AutoMigrate(&entity.User{}); err != nil {
+	if err := db.AutoMigrate(&entity.Package{}); err != nil {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
-	if err := db.AutoMigrate(&entity.User{}); err != nil {
+	if err := db.AutoMigrate(&entity.Delivery{}); err != nil {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
 
-	return &GormDB{db: db}, err
+	return db, err
+}
+
+func GenerateGormDNS(cfg config.DB) string {
+	if cfg.DNS != "" {
+		return cfg.DNS
+	}
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", cfg.Host, cfg.Port, cfg.User, cfg.Pwd, cfg.Name, cfg.SSLMode)
 }

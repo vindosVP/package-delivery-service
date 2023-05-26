@@ -7,7 +7,7 @@ import (
 
 type Delivery struct {
 	gorm.Model
-	ID          uuid.UUID `gorm:"type:uuid;primary_key;unique;not_null" json:"ID"`
+	ID          uuid.UUID `gorm:"type:uuid;primary_key;unique;not_null;default:uuid_generate_v4()" json:"ID"`
 	SenderID    uuid.UUID `gorm:"type:uuid;not_null" json:"senderID"`
 	Sender      User      `gorm:"foreignkey:SenderID"`
 	RecipientID uuid.UUID `gorm:"type:uuid;not_null" json:"recipientID"`
