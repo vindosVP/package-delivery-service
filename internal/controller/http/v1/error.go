@@ -1,12 +1,20 @@
 package v1
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"errors"
+	"github.com/gofiber/fiber/v2"
+)
 
-func errorResponse(ctx *fiber.Ctx, code int, msg string, err error) error {
+var (
+	ErrorUserAlreadyExists = errors.New("user already exists")
+	ErrorUserValidation    = errors.New("user validation failed")
+)
+
+func errorResponse(ctx *fiber.Ctx, code int, msg string, data interface{}, err error) error {
 	return ctx.Status(code).JSON(Response{
 		StatusCode: code,
 		Message:    msg,
-		Data:       nil,
-		Error:      err,
+		Data:       data,
+		Error:      err.Error(),
 	})
 }

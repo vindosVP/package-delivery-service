@@ -2,9 +2,11 @@ package v1
 
 import (
 	"clean-architecture-service/internal/usecase"
+	"clean-architecture-service/internal/validations"
 	"clean-architecture-service/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type UserRoutes struct {
@@ -13,11 +15,11 @@ type UserRoutes struct {
 }
 
 type registerUserRequest struct {
-	Email           string `json:"email" binding:"required"  example:"vadiminmail@gmail.com"`
-	Password        string `json:"password" binding:"required"  example:"qwerty123"`
-	Name            string `json:"name" binding:"required"  example:"Vadim"`
-	LastName        string `json:"lastName" binding:"required"  example:"Valov"`
-	DeliveryAddress string `json:"deliveryAddress" binding:"required"  example:"Pushkina street"`
+	Email           string `json:"email" binding:"required"  example:"vadiminmail@gmail.com" validate:"required,email"`
+	Password        string `json:"password" binding:"required"  example:"qwerty123" validate:"required,min=8,max=50"`
+	Name            string `json:"name" binding:"required"  example:"Vadim" validate:"required"`
+	LastName        string `json:"lastName" binding:"required"  example:"Valov" validate:"required"`
+	DeliveryAddress string `json:"deliveryAddress" binding:"required"  example:"Pushkina street"  validate:"required"`
 }
 
 type registerUserResponse struct {
@@ -51,8 +53,25 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 func (r *UserRoutes) register(c *fiber.Ctx) error {
 	user := &registerUserRequest{}
 	if err := c.BodyParser(user); err != nil {
-		r.l.Error(err, "http - v1 - c.BodyParser")
-		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", err)
+		r.l.Error(err, "v1 - register - c.BodyParser")
+		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+	}
+
+	isValid, errs := validations.UniversalValidation(user)
+
+	if !isValid {
+		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorUserValidation)
+	}
+
+	exists, err := r.u.UserExists(user.Email)
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		r.l.Error(err, "http - v1 - r.u.UserExists")
+		return errorResponse(c, fiber.StatusInternalServerError, "Failed to check if user already exists", nil, err)
+	}
+
+	if exists {
+		return errorResponse(c, fiber.StatusBadRequest, "User with this email already exists", nil, ErrorUserAlreadyExists)
 	}
 
 	res, err := r.u.Register(
@@ -65,7 +84,7 @@ func (r *UserRoutes) register(c *fiber.Ctx) error {
 
 	if err != nil {
 		r.l.Error(err, "http - v1 - r.u.Register")
-		return errorResponse(c, fiber.StatusInternalServerError, "Failed to create user", err)
+		return errorResponse(c, fiber.StatusInternalServerError, "Failed to create user", nil, err)
 	}
 
 	responseData := &registerUserResponse{

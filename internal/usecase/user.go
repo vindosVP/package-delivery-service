@@ -33,3 +33,7 @@ func (u UserUseCase) Register(email string, password string, name string, lastNa
 	})
 
 }
+
+func (u UserUseCase) UserExists(email string) (bool, error) {
+	return u.userRepo.UserExists(email)
+}
