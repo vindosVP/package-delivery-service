@@ -10,7 +10,6 @@ import (
 
 var (
 	JwtSignatureKey  = []byte(config.Cfg.App.JWTSecret)
-	JwtExpireTime    = time.Now().Add(time.Hour * 24 * 7)
 	JwtSigningMethod = jwt.SigningMethodHS256
 )
 
@@ -29,7 +28,7 @@ func GenerateJWT(user *entity.User) (string, int64, error) {
 	claims := MyClaims{
 		RegClaims: jwt.RegisteredClaims{
 			Issuer:    config.Cfg.App.Name,
-			ExpiresAt: jwt.NewNumericDate(JwtExpireTime),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
 		},
 		Name:     user.Name,
 		LastName: user.LastName,
@@ -40,7 +39,7 @@ func GenerateJWT(user *entity.User) (string, int64, error) {
 	if err != nil {
 		return "", 0, err
 	}
-	return signedJWT, JwtExpireTime.Unix(), nil
+	return signedJWT, time.Now().Add(time.Hour * 24 * 7).Unix(), nil
 }
 
 func GenerateRefreshToken() (string, error) {
