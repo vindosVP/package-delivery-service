@@ -6,8 +6,7 @@ import (
 )
 
 var (
-	ErrorUserAlreadyExists = errors.New("user already exists")
-	ErrorUserValidation    = errors.New("user validation failed")
+	ErrorValidationFailed = errors.New("request validation failed")
 )
 
 func errorResponse(ctx *fiber.Ctx, code int, msg string, data interface{}, err error) error {
