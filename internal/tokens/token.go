@@ -25,10 +25,12 @@ func (m MyClaims) Valid() error {
 }
 
 func GenerateJWT(user *entity.User) (string, int64, error) {
+
+	expTime := time.Now().Add(time.Hour * 24 * 7)
 	claims := MyClaims{
 		RegClaims: jwt.RegisteredClaims{
 			Issuer:    config.Cfg.App.Name,
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
+			ExpiresAt: jwt.NewNumericDate(expTime),
 		},
 		Name:     user.Name,
 		LastName: user.LastName,
@@ -39,7 +41,7 @@ func GenerateJWT(user *entity.User) (string, int64, error) {
 	if err != nil {
 		return "", 0, err
 	}
-	return signedJWT, time.Now().Add(time.Hour * 24 * 7).Unix(), nil
+	return signedJWT, expTime.Unix(), nil
 }
 
 func GenerateRefreshToken() (string, error) {
