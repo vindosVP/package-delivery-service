@@ -50,6 +50,17 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 	h.Post("refresh", r.refresh)
 }
 
+// @Summary     Refresh
+// @Description Refreshes users JWT token
+// @ID          refresh
+// @Tags  	    users
+// @Accept      json
+// @Produce     json
+// @Param       request body refreshAuthRequest true "User data"
+// @Success     200 {object} Response
+// @Failure     400 {object} Response
+// @Failure     500 {object} Response
+// @Router      /user/refresh [post]
 func (r *UserRoutes) refresh(c *fiber.Ctx) error {
 	req := &refreshAuthRequest{}
 	if err := c.BodyParser(req); err != nil {
