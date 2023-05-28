@@ -9,9 +9,9 @@ type Config struct {
 }
 
 type App struct {
-	Name      string `env:"APP_NAME"`
+	Name      string `env:"APP_NAME" envDefault:"myAppName"`
 	Port      string `env:"APP_PORT" envDefault:":8080"`
-	JWTSecret string `env:"JWT_SECRET"`
+	JWTSecret string `env:"JWT_SECRET" envDefault:"jwtSecret"`
 }
 
 type DB struct {
@@ -28,12 +28,13 @@ type Log struct {
 	Level string `env:"LOG_LEVEL" envDefault:"debug"`
 }
 
-func NewConfig() (*Config, error) {
-	cfg := &Config{}
+var Cfg Config
 
-	if err := env.Parse(cfg); err != nil {
+func NewConfig() (*Config, error) {
+
+	if err := env.Parse(&Cfg); err != nil {
 		return nil, err
 	}
 
-	return cfg, nil
+	return &Cfg, nil
 }
