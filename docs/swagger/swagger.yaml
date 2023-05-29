@@ -83,6 +83,28 @@ definitions:
     - lastName
     - name
     type: object
+  v1.updateUserRequest:
+    properties:
+      deliveryAddress:
+        example: Pushkina street
+        type: string
+      lastName:
+        example: Valov
+        type: string
+      name:
+        example: Vadim
+        type: string
+      password:
+        example: qwerty123
+        maxLength: 50
+        minLength: 8
+        type: string
+    required:
+    - deliveryAddress
+    - lastName
+    - name
+    - password
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -90,6 +112,37 @@ info:
   title: Delivery service API
   version: "1.0"
 paths:
+  /user:
+    patch:
+      consumes:
+      - application/json
+      description: Updates users data
+      operationId: update
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Update
+      tags:
+      - users
   /user/auth:
     post:
       consumes:

@@ -9,6 +9,53 @@
     "host": "localhost:8080",
     "basePath": "/v1",
     "paths": {
+        "/user": {
+            "patch": {
+                "description": "Updates users data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update",
+                "operationId": "update",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.updateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/auth": {
             "post": {
                 "description": "Authenticates user",
@@ -262,6 +309,35 @@
                 "name": {
                     "type": "string",
                     "example": "Vadim"
+                }
+            }
+        },
+        "v1.updateUserRequest": {
+            "type": "object",
+            "required": [
+                "deliveryAddress",
+                "lastName",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "deliveryAddress": {
+                    "type": "string",
+                    "example": "Pushkina street"
+                },
+                "lastName": {
+                    "type": "string",
+                    "example": "Valov"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Vadim"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 8,
+                    "example": "qwerty123"
                 }
             }
         }

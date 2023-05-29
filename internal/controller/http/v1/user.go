@@ -1,16 +1,25 @@
 package v1
 
 import (
+	"clean-architecture-service/internal/controller/http/v1/middleware"
 	"clean-architecture-service/internal/usecase"
 	"clean-architecture-service/internal/validations"
 	"clean-architecture-service/pkg/logger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
 type UserRoutes struct {
 	u usecase.User
 	l logger.Interface
+}
+
+type updateUserRequest struct {
+	Password        string `json:"password" binding:"required"  example:"qwerty123" validate:"required,min=8,max=50"`
+	Name            string `json:"name" binding:"required"  example:"Vadim" validate:"required"`
+	LastName        string `json:"lastName" binding:"required"  example:"Valov" validate:"required"`
+	DeliveryAddress string `json:"deliveryAddress" binding:"required"  example:"Pushkina street"  validate:"required"`
 }
 
 type registerUserRequest struct {
@@ -22,6 +31,14 @@ type registerUserRequest struct {
 }
 
 type registerUserResponse struct {
+	ID              uuid.UUID `json:"id" binding:"required"  example:"d9e48656-ae36-4fde-af78-5f6250e11ead"`
+	Email           string    `json:"email" binding:"required"  example:"vadiminmail@gmail.com"`
+	Name            string    `json:"name" binding:"required"  example:"Vadim"`
+	LastName        string    `json:"lastName" binding:"required"  example:"Valov"`
+	DeliveryAddress string    `json:"deliveryAddress" binding:"required"  example:"Pushkina street"`
+}
+
+type updateUserResponse struct {
 	ID              uuid.UUID `json:"id" binding:"required"  example:"d9e48656-ae36-4fde-af78-5f6250e11ead"`
 	Email           string    `json:"email" binding:"required"  example:"vadiminmail@gmail.com"`
 	Name            string    `json:"name" binding:"required"  example:"Vadim"`
@@ -47,7 +64,69 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 	h := handler.Group("/user")
 	h.Post("/register", r.register)
 	h.Post("/auth", r.auth)
-	h.Post("refresh", r.refresh)
+	h.Post("/refresh", r.refresh)
+	h.Patch("", middleware.Protected(), r.update)
+}
+
+// @Summary     Update
+// @Description Updates users data
+// @ID          update
+// @Tags  	    users
+// @Accept      json
+// @Produce     json
+// @Param       request body updateUserRequest true "User data"
+// @Success     200 {object} Response
+// @Failure     400 {object} Response
+// @Failure     500 {object} Response
+// @Router      /user [patch]
+func (r *UserRoutes) update(c *fiber.Ctx) error {
+	req := &updateUserRequest{}
+	if err := c.BodyParser(req); err != nil {
+		r.l.Error(err, "v1 - register - c.BodyParser")
+		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+	}
+	isValid, errs := validations.UniversalValidation(req)
+
+	if !isValid {
+		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
+	}
+
+	jwtData := c.Locals("jwt").(*jwt.Token)
+	claims := jwtData.Claims.(jwt.MapClaims)
+	id := claims["id"].(string)
+
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		r.l.Error(err, "v1 - register - uuid.Parse")
+		return errorResponse(c, fiber.StatusInternalServerError, "Failed to parse the uuid", nil, err)
+	}
+
+	user, err := r.u.Update(
+		userID,
+		req.Password,
+		req.Name,
+		req.LastName,
+		req.DeliveryAddress,
+	)
+
+	if err != nil {
+		if err == usecase.ErrorUserDoesNotExist {
+			return errorResponse(c, fiber.StatusBadRequest, "User with this id does not exist", nil, err)
+		} else {
+			r.l.Error(err, "http - v1 - r.u.Update")
+			return errorResponse(c, fiber.StatusInternalServerError, "Failed to update user", nil, err)
+		}
+	}
+
+	res := updateUserResponse{
+		ID:              user.ID,
+		Email:           user.Email,
+		Name:            user.Name,
+		LastName:        user.LastName,
+		DeliveryAddress: user.DeliveryAddress,
+	}
+
+	return OkResponse(c, fiber.StatusOK, "User updated successfully", res)
 }
 
 // @Summary     Refresh

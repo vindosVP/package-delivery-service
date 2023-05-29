@@ -21,6 +21,45 @@ func New(ur UserRepo, tr TokenRepo) *UserUseCase {
 	}
 }
 
+func (u UserUseCase) Update(userID uuid.UUID, password string, name string, lastName string, delAddr string) (*entity.User, error) {
+	hashPwd, err := utils.GeneratePassword(password)
+
+	if err != nil {
+		return nil, fmt.Errorf("UserUsecase - Update - utils.GeneratePassword")
+	}
+
+	exists, err := u.userRepo.UserExistsByID(userID)
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("UserUsecase - Update - u.UserExists")
+	}
+
+	if !exists {
+		return nil, ErrorUserDoesNotExist
+	}
+
+	user, err := u.userRepo.FindByID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("UserUsecase - Update - u.userRepo.FindByID")
+	}
+
+	userUpd := &entity.User{
+		ID:              userID,
+		Password:        hashPwd,
+		Email:           user.Email,
+		Name:            name,
+		LastName:        lastName,
+		DeliveryAddress: delAddr,
+	}
+
+	newUser, err := u.userRepo.Update(userUpd)
+	if err != nil {
+		return nil, fmt.Errorf("UserUsecase - Update - u.userRepo.Update")
+	}
+
+	return newUser, nil
+}
+
 func (u UserUseCase) Register(email string, password string, name string, lastName string, delAddr string) (*entity.User, error) {
 	hashPwd, err := utils.GeneratePassword(password)
 
