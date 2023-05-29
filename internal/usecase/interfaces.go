@@ -11,13 +11,16 @@ type User interface {
 	Register(email string, password string, name string, lastName string, delAddr string) (*entity.User, error)
 	Auth(email string, password string) (map[string]interface{}, error)
 	Refresh(token string, UserID uuid.UUID) (map[string]interface{}, error)
+	Update(userID uuid.UUID, password string, name string, lastName string, delAddr string) (*entity.User, error)
 }
 
 type UserRepo interface {
 	Create(user *entity.User) (*entity.User, error)
 	UserExists(email string) (bool, error)
+	UserExistsByID(userID uuid.UUID) (bool, error)
 	FindByEmail(email string) (*entity.User, error)
 	FindByID(UserID uuid.UUID) (*entity.User, error)
+	Update(user *entity.User) (*entity.User, error)
 }
 
 type TokenRepo interface {

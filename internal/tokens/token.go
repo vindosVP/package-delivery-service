@@ -1,23 +1,23 @@
 package tokens
 
 import (
-	"clean-architecture-service/config"
 	"clean-architecture-service/internal/entity"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"time"
 )
 
 var (
-	JwtSignatureKey  = []byte(config.Cfg.App.JWTSecret)
+	JwtSignatureKey  = []byte("jwtSecret")
 	JwtSigningMethod = jwt.SigningMethodHS256
 )
 
 type MyClaims struct {
-	RegClaims jwt.RegisteredClaims
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	LastName  string `json:"lastName"`
+	RegisteredClaims jwt.RegisteredClaims
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	LastName         string `json:"lastName"`
 }
 
 func (m MyClaims) Valid() error {
@@ -26,25 +26,31 @@ func (m MyClaims) Valid() error {
 
 func GenerateJWT(user *entity.User) (string, int64, error) {
 
-	expTime := time.Now().Add(time.Hour * 24 * 7)
+	exp := time.Now().Add(time.Hour * 24 * 7)
 	claims := MyClaims{
-		RegClaims: jwt.RegisteredClaims{
-			Issuer:    config.Cfg.App.Name,
-			ExpiresAt: jwt.NewNumericDate(expTime),
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "orders-service",
+			ExpiresAt: jwt.NewNumericDate(exp),
 		},
-		Name:     user.Name,
-		LastName: user.LastName,
-		ID:       user.ID.String(),
+		ID:   user.ID.String(),
+		Name: user.Name,
 	}
+
 	token := jwt.NewWithClaims(JwtSigningMethod, claims)
-	signedJWT, err := token.SignedString(JwtSignatureKey)
+	signedToken, err := token.SignedString(JwtSignatureKey)
 	if err != nil {
 		return "", 0, err
 	}
-	return signedJWT, expTime.Unix(), nil
+
+	return signedToken, exp.Unix(), nil
 }
 
 func GenerateRefreshToken() (string, error) {
 	id, err := gonanoid.New()
 	return id, err
+}
+
+type TokenMetadata struct {
+	UserID  uuid.UUID
+	Expires int64
 }
