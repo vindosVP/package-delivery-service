@@ -10,8 +10,8 @@ type Package struct {
 	ID      uuid.UUID `gorm:"type:uuid;primary_key;unique;not_null;default:uuid_generate_v4()" json:"ID"`
 	Owner   User      `gorm:"foreignkey:OwnerID"`
 	OwnerID uuid.UUID `gorm:"type:uuid;not_null" json:"ownerID"`
-	Type    string    `gorm:"type:varchar(255);not_null" json:"type"`
-	Weight  int       `gorm:"not_null" json:"weight"`
-	Height  int       `gorm:"not_null" json:"height"`
-	Width   int       `gorm:"not_null" json:"width"`
+	Name    string    `gorm:"type:varchar(255);not_null" json:"name"`
+	Weight  float64   `gorm:"not_null" json:"weight"`
+	Height  float64   `gorm:"not_null" json:"height"`
+	Width   float64   `gorm:"not_null" json:"width"`
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// go:swag init -g internal/controller/http/v1/router.go --output docs/swagger
+
 // SetupRouter -.
 // Swagger spec:
 // @title       Delivery service API
@@ -15,7 +17,7 @@ import (
 // @version     1.0
 // @host        localhost:8080
 // @BasePath    /v1
-func SetupRouter(handler *fiber.App, u usecase.User, l logger.Interface) {
+func SetupRouter(handler *fiber.App, u usecase.User, p usecase.Package, l logger.Interface) {
 	handler.Get("/ping", func(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusOK)
 	})
@@ -24,5 +26,6 @@ func SetupRouter(handler *fiber.App, u usecase.User, l logger.Interface) {
 	h := handler.Group("/v1")
 	{
 		SetUserRoutes(h, u, l)
+		SetPackageRoutes(h, p, l)
 	}
 }

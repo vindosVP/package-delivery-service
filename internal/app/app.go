@@ -4,6 +4,7 @@ import (
 	"clean-architecture-service/config"
 	v1 "clean-architecture-service/internal/controller/http/v1"
 	"clean-architecture-service/internal/usecase"
+	"clean-architecture-service/internal/usecase/package_repo"
 	"clean-architecture-service/internal/usecase/token_repo"
 	"clean-architecture-service/internal/usecase/user_repo"
 	"clean-architecture-service/internal/validations"
@@ -25,9 +26,10 @@ func Run(cfg *config.Config) {
 		lg.Fatal(fmt.Errorf("app - Run - validations.InitValidations: %w", err))
 	}
 
-	userUseCase := usecase.New(user_repo.New(db), token_repo.New(db))
+	userUseCase := usecase.NewUserUseCase(user_repo.New(db), token_repo.New(db))
+	packageUseCase := usecase.NewPackageUseCase(package_repo.New(db))
 	handler := fiber.New()
-	v1.SetupRouter(handler, userUseCase, lg)
+	v1.SetupRouter(handler, userUseCase, packageUseCase, lg)
 
 	if err := handler.Listen(cfg.App.Port); err != nil {
 		lg.Fatal(fmt.Errorf("app - Run - handler.Listen: %w", err))

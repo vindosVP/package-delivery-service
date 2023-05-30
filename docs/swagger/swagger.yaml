@@ -23,6 +23,26 @@ definitions:
     - email
     - password
     type: object
+  v1.createPackageRequest:
+    properties:
+      height:
+        example: 15
+        type: number
+      name:
+        example: Package for Moxem
+        type: string
+      weight:
+        example: 11.3
+        type: number
+      width:
+        example: 13.8
+        type: number
+    required:
+    - height
+    - name
+    - weight
+    - width
+    type: object
   v1.refreshAuthRequest:
     properties:
       refresh_token:
@@ -112,19 +132,38 @@ info:
   title: Delivery service API
   version: "1.0"
 paths:
-  /user:
+  /packages:
+    get:
+      consumes:
+      - application/json
+      description: Returns user`s packages
+      operationId: getPackages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Get packages
+      tags:
+      - packages
     patch:
       consumes:
       - application/json
-      description: Updates users data
-      operationId: update
+      description: Updates a package
+      operationId: updatePackage
       parameters:
       - description: User data
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.updateUserRequest'
+          $ref: '#/definitions/v1.createPackageRequest'
       produces:
       - application/json
       responses:
@@ -142,8 +181,38 @@ paths:
             $ref: '#/definitions/v1.Response'
       summary: Update
       tags:
-      - users
-  /user/auth:
+      - packages
+    post:
+      consumes:
+      - application/json
+      description: Crates a package
+      operationId: create
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.createPackageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Create
+      tags:
+      - packages
+  /users/user/auth:
     post:
       consumes:
       - application/json
@@ -174,7 +243,7 @@ paths:
       summary: Auth
       tags:
       - users
-  /user/refresh:
+  /users/user/refresh:
     post:
       consumes:
       - application/json
@@ -205,7 +274,7 @@ paths:
       summary: Refresh
       tags:
       - users
-  /user/register:
+  /users/user/register:
     post:
       consumes:
       - application/json
@@ -221,8 +290,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/v1.registerUserResponse'
         "400":
@@ -234,6 +303,37 @@ paths:
           schema:
             $ref: '#/definitions/v1.Response'
       summary: Register
+      tags:
+      - users
+  /users/user/update:
+    patch:
+      consumes:
+      - application/json
+      description: Updates users data
+      operationId: update
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Update
       tags:
       - users
 swagger: "2.0"

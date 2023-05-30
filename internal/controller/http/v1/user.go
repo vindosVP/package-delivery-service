@@ -4,9 +4,9 @@ import (
 	"clean-architecture-service/internal/controller/http/v1/middleware"
 	"clean-architecture-service/internal/usecase"
 	"clean-architecture-service/internal/validations"
+	"clean-architecture-service/pkg/database"
 	"clean-architecture-service/pkg/logger"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
@@ -61,11 +61,11 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 		u: u,
 		l: l,
 	}
-	h := handler.Group("/user")
-	h.Post("/register", r.register)
-	h.Post("/auth", r.auth)
-	h.Post("/refresh", r.refresh)
-	h.Patch("", middleware.Protected(), r.update)
+	h := handler.Group("/users")
+	h.Post("/user/register", r.register)
+	h.Post("/user/auth", r.auth)
+	h.Post("/user/refresh", middleware.GormTransaction(database.DB, l), r.refresh)
+	h.Patch("/user/update", middleware.Protected(), r.update)
 }
 
 // @Summary     Update
@@ -78,7 +78,7 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 // @Success     200 {object} Response
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
-// @Router      /user [patch]
+// @Router      /users/user/update [patch]
 func (r *UserRoutes) update(c *fiber.Ctx) error {
 	req := &updateUserRequest{}
 	if err := c.BodyParser(req); err != nil {
@@ -91,9 +91,7 @@ func (r *UserRoutes) update(c *fiber.Ctx) error {
 		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
 	}
 
-	jwtData := c.Locals("jwt").(*jwt.Token)
-	claims := jwtData.Claims.(jwt.MapClaims)
-	id := claims["id"].(string)
+	id := GetUserIDFromJWT(c)
 
 	userID, err := uuid.Parse(id)
 	if err != nil {
@@ -139,7 +137,7 @@ func (r *UserRoutes) update(c *fiber.Ctx) error {
 // @Success     200 {object} Response
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
-// @Router      /user/refresh [post]
+// @Router      /users/user/refresh [post]
 func (r *UserRoutes) refresh(c *fiber.Ctx) error {
 	req := &refreshAuthRequest{}
 	if err := c.BodyParser(req); err != nil {
@@ -176,7 +174,7 @@ func (r *UserRoutes) refresh(c *fiber.Ctx) error {
 // @Success     200 {object} Response
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
-// @Router      /user/auth [post]
+// @Router      /users/user/auth [post]
 func (r *UserRoutes) auth(c *fiber.Ctx) error {
 	req := &authUserRequest{}
 	if err := c.BodyParser(req); err != nil {
@@ -210,10 +208,10 @@ func (r *UserRoutes) auth(c *fiber.Ctx) error {
 // @Accept      json
 // @Produce     json
 // @Param       request body registerUserRequest true "User data"
-// @Success     200 {object} registerUserResponse
+// @Success     201 {object} registerUserResponse
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
-// @Router      /user/register [post]
+// @Router      /users/user/register [post]
 func (r *UserRoutes) register(c *fiber.Ctx) error {
 	req := &registerUserRequest{}
 	if err := c.BodyParser(req); err != nil {
@@ -252,5 +250,5 @@ func (r *UserRoutes) register(c *fiber.Ctx) error {
 		DeliveryAddress: res.DeliveryAddress,
 	}
 
-	return OkResponse(c, fiber.StatusOK, "User created", responseData)
+	return OkResponse(c, fiber.StatusCreated, "User created", responseData)
 }
