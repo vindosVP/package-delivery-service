@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB
+
 func NewGorm(cfg config.DB) (*gorm.DB, error) {
 
 	dns := GenerateGormDNS(cfg)
@@ -29,7 +31,7 @@ func NewGorm(cfg config.DB) (*gorm.DB, error) {
 	if err := db.AutoMigrate(&entity.Delivery{}); err != nil {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
-
+	DB = db
 	return db, err
 }
 

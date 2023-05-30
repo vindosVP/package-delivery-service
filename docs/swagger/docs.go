@@ -16,9 +16,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user": {
-            "patch": {
-                "description": "Updates users data",
+        "/packages": {
+            "get": {
+                "description": "Returns user` + "`" + `s packages",
                 "consumes": [
                     "application/json"
                 ],
@@ -26,10 +26,38 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "packages"
                 ],
-                "summary": "Update",
-                "operationId": "update",
+                "summary": "Get packages",
+                "operationId": "getPackages",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Crates a package",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "packages"
+                ],
+                "summary": "Create",
+                "operationId": "create",
                 "parameters": [
                     {
                         "description": "User data",
@@ -37,7 +65,52 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.updateUserRequest"
+                            "$ref": "#/definitions/v1.createPackageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates a package",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "packages"
+                ],
+                "summary": "Update",
+                "operationId": "updatePackage",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.createPackageRequest"
                         }
                     }
                 ],
@@ -63,7 +136,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/auth": {
+        "/users/user/auth": {
             "post": {
                 "description": "Authenticates user",
                 "consumes": [
@@ -110,7 +183,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/refresh": {
+        "/users/user/refresh": {
             "post": {
                 "description": "Refreshes users JWT token",
                 "consumes": [
@@ -157,7 +230,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/register": {
+        "/users/user/register": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -183,10 +256,57 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/v1.registerUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/user/update": {
+            "patch": {
+                "description": "Updates users data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update",
+                "operationId": "update",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.updateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.registerUserResponse"
+                            "$ref": "#/definitions/v1.Response"
                         }
                     },
                     "400": {
@@ -235,6 +355,33 @@ const docTemplate = `{
                     "maxLength": 50,
                     "minLength": 8,
                     "example": "qwerty123"
+                }
+            }
+        },
+        "v1.createPackageRequest": {
+            "type": "object",
+            "required": [
+                "height",
+                "name",
+                "weight",
+                "width"
+            ],
+            "properties": {
+                "height": {
+                    "type": "number",
+                    "example": 15
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Package for Moxem"
+                },
+                "weight": {
+                    "type": "number",
+                    "example": 11.3
+                },
+                "width": {
+                    "type": "number",
+                    "example": 13.8
                 }
             }
         },

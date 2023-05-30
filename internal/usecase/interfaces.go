@@ -14,6 +14,12 @@ type User interface {
 	Update(userID uuid.UUID, password string, name string, lastName string, delAddr string) (*entity.User, error)
 }
 
+type Package interface {
+	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
+	Update(userID uuid.UUID, packageID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
+	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
+}
+
 type UserRepo interface {
 	Create(user *entity.User) (*entity.User, error)
 	UserExists(email string) (bool, error)
@@ -27,4 +33,11 @@ type TokenRepo interface {
 	Create(userID uuid.UUID, token string) error
 	GetActiveToken(UserID uuid.UUID) (*entity.Token, error)
 	Revoke(UserID uuid.UUID) error
+}
+
+type PackageRepo interface {
+	Create(pack *entity.Package) (*entity.Package, error)
+	FindByID(packageID uuid.UUID) (*entity.Package, error)
+	Update(pack *entity.Package) (*entity.Package, error)
+	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
 }
