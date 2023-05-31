@@ -12,6 +12,8 @@ import (
 	"clean-architecture-service/pkg/logger"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	fiberlog "github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
 func Run(cfg *config.Config) {
@@ -29,6 +31,17 @@ func Run(cfg *config.Config) {
 	userUseCase := usecase.NewUserUseCase(user_repo.New(db), token_repo.New(db))
 	packageUseCase := usecase.NewPackageUseCase(package_repo.New(db))
 	handler := fiber.New()
+
+	handler.Use(fiberlog.New(fiberlog.Config{
+		TimeZone: "Europe/Moscow",
+		Format:   "[${time}] ${locals:request-id} ${status} - ${latency} ${method} ${path}​\n",
+	}))
+
+	handler.Use(requestid.New(requestid.Config{
+		Header:     "X-Request-ID",
+		ContextKey: "request-id",
+	}))
+
 	v1.SetupRouter(handler, userUseCase, packageUseCase, lg)
 
 	if err := handler.Listen(cfg.App.Port); err != nil {

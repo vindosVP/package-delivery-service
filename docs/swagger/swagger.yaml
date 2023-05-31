@@ -1,5 +1,46 @@
 basePath: /v1
 definitions:
+  v1.PackageRequest:
+    properties:
+      height:
+        example: 15
+        type: number
+      name:
+        example: Package for Moxem
+        type: string
+      weight:
+        example: 11.3
+        type: number
+      width:
+        example: 13.8
+        type: number
+    required:
+    - height
+    - name
+    - weight
+    - width
+    type: object
+  v1.PackageResponse:
+    properties:
+      height:
+        example: 15
+        type: number
+      name:
+        example: Package for Moxem
+        type: string
+      ownerID:
+        example: P1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6
+        type: string
+      packageID:
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        type: string
+      weight:
+        example: 11.3
+        type: number
+      width:
+        example: 13.8
+        type: number
+    type: object
   v1.Response:
     properties:
       data: {}
@@ -22,26 +63,6 @@ definitions:
     required:
     - email
     - password
-    type: object
-  v1.createPackageRequest:
-    properties:
-      height:
-        example: 15
-        type: number
-      name:
-        example: Package for Moxem
-        type: string
-      weight:
-        example: 11.3
-        type: number
-      width:
-        example: 13.8
-        type: number
-    required:
-    - height
-    - name
-    - weight
-    - width
     type: object
   v1.refreshAuthRequest:
     properties:
@@ -125,6 +146,30 @@ definitions:
     - name
     - password
     type: object
+  v1.updateUserResponse:
+    properties:
+      deliveryAddress:
+        example: Pushkina street
+        type: string
+      email:
+        example: vadiminmail@gmail.com
+        type: string
+      id:
+        example: d9e48656-ae36-4fde-af78-5f6250e11ead
+        type: string
+      lastName:
+        example: Valov
+        type: string
+      name:
+        example: Vadim
+        type: string
+    required:
+    - deliveryAddress
+    - email
+    - id
+    - lastName
+    - name
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -144,42 +189,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.Response'
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.PackageResponse'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.Response'
       summary: Get packages
-      tags:
-      - packages
-    patch:
-      consumes:
-      - application/json
-      description: Updates a package
-      operationId: updatePackage
-      parameters:
-      - description: User data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.createPackageRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/v1.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.Response'
-      summary: Update
       tags:
       - packages
     post:
@@ -193,14 +215,19 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.createPackageRequest'
+          $ref: '#/definitions/v1.PackageRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/v1.Response'
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.PackageResponse'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -210,6 +237,79 @@ paths:
           schema:
             $ref: '#/definitions/v1.Response'
       summary: Create
+      tags:
+      - packages
+  /packages/{packageID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns package by id
+      operationId: getPackage
+      parameters:
+      - description: package ID
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        in: path
+        name: packageID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.PackageResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Get package
+      tags:
+      - packages
+    patch:
+      consumes:
+      - application/json
+      description: Updates a package
+      operationId: updatePackage
+      parameters:
+      - description: package ID
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        in: path
+        name: packageID
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.PackageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.PackageResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Update
       tags:
       - packages
   /users/user/auth:
@@ -293,7 +393,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/v1.registerUserResponse'
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.registerUserResponse'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -324,7 +429,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.Response'
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.updateUserResponse'
+              type: object
         "400":
           description: Bad Request
           schema:

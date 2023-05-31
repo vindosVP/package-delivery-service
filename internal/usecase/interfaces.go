@@ -18,6 +18,7 @@ type Package interface {
 	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
 	Update(userID uuid.UUID, packageID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
 	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
+	GetPackage(UserID uuid.UUID, packageID uuid.UUID) (*entity.Package, error)
 }
 
 type UserRepo interface {

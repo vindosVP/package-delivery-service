@@ -3,7 +3,6 @@ package tokens
 import (
 	"clean-architecture-service/internal/entity"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"time"
 )
@@ -25,7 +24,6 @@ func (m MyClaims) Valid() error {
 }
 
 func GenerateJWT(user *entity.User) (string, int64, error) {
-
 	exp := time.Now().Add(time.Hour * 24 * 7)
 	claims := MyClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -48,9 +46,4 @@ func GenerateJWT(user *entity.User) (string, int64, error) {
 func GenerateRefreshToken() (string, error) {
 	id, err := gonanoid.New()
 	return id, err
-}
-
-type TokenMetadata struct {
-	UserID  uuid.UUID
-	Expires int64
 }

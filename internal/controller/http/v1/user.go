@@ -75,7 +75,7 @@ func SetUserRoutes(handler fiber.Router, u usecase.User, l logger.Interface) {
 // @Accept      json
 // @Produce     json
 // @Param       request body updateUserRequest true "User data"
-// @Success     200 {object} Response
+// @Success     200 {object} Response{data=updateUserResponse}
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
 // @Router      /users/user/update [patch]
@@ -83,20 +83,20 @@ func (r *UserRoutes) update(c *fiber.Ctx) error {
 	req := &updateUserRequest{}
 	if err := c.BodyParser(req); err != nil {
 		r.l.Error(err, "v1 - register - c.BodyParser")
-		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+		return errorResponse(c, fiber.StatusBadRequest, MsgInvalidRequestBody, nil, err)
 	}
 	isValid, errs := validations.UniversalValidation(req)
 
 	if !isValid {
-		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
+		return errorResponse(c, fiber.StatusBadRequest, MsgNotValid, errs, ErrorValidationFailed)
 	}
 
-	id := GetUserIDFromJWT(c)
+	id := GetUserIDAsStr(c)
 
 	userID, err := uuid.Parse(id)
 	if err != nil {
 		r.l.Error(err, "v1 - register - uuid.Parse")
-		return errorResponse(c, fiber.StatusInternalServerError, "Failed to parse the uuid", nil, err)
+		return errorResponse(c, fiber.StatusInternalServerError, MsgFailedToParseUUID, nil, err)
 	}
 
 	user, err := r.u.Update(
@@ -109,7 +109,7 @@ func (r *UserRoutes) update(c *fiber.Ctx) error {
 
 	if err != nil {
 		if err == usecase.ErrorUserDoesNotExist {
-			return errorResponse(c, fiber.StatusBadRequest, "User with this id does not exist", nil, err)
+			return errorResponse(c, fiber.StatusBadRequest, MsgUserDoesNotExist, nil, err)
 		} else {
 			r.l.Error(err, "http - v1 - r.u.Update")
 			return errorResponse(c, fiber.StatusInternalServerError, "Failed to update user", nil, err)
@@ -142,19 +142,19 @@ func (r *UserRoutes) refresh(c *fiber.Ctx) error {
 	req := &refreshAuthRequest{}
 	if err := c.BodyParser(req); err != nil {
 		r.l.Error(err, "v1 - register - c.BodyParser")
-		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+		return errorResponse(c, fiber.StatusBadRequest, MsgInvalidRequestBody, nil, err)
 	}
 
 	isValid, errs := validations.UniversalValidation(req)
 
 	if !isValid {
-		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
+		return errorResponse(c, fiber.StatusBadRequest, MsgNotValid, errs, ErrorValidationFailed)
 	}
 
 	res, err := r.u.Refresh(req.RefreshToken, req.UserID)
 	if err != nil {
 		if err == usecase.ErrorInvalidToken {
-			return errorResponse(c, fiber.StatusBadRequest, "Invalid token", nil, err)
+			return errorResponse(c, fiber.StatusBadRequest, MsgInvalidToken, nil, err)
 		} else {
 			r.l.Error(err, "http - v1 - r.u.Auth")
 			return errorResponse(c, fiber.StatusInternalServerError, "Failed to refresh token", nil, err)
@@ -179,19 +179,19 @@ func (r *UserRoutes) auth(c *fiber.Ctx) error {
 	req := &authUserRequest{}
 	if err := c.BodyParser(req); err != nil {
 		r.l.Error(err, "v1 - register - c.BodyParser")
-		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+		return errorResponse(c, fiber.StatusBadRequest, MsgInvalidRequestBody, nil, err)
 	}
 
 	isValid, errs := validations.UniversalValidation(req)
 
 	if !isValid {
-		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
+		return errorResponse(c, fiber.StatusBadRequest, MsgNotValid, errs, ErrorValidationFailed)
 	}
 
 	res, err := r.u.Auth(req.Email, req.Password)
 	if err != nil {
 		if err == usecase.ErrorInvalidEmailOrPwd {
-			return errorResponse(c, fiber.StatusBadRequest, "Invalid email or password", nil, err)
+			return errorResponse(c, fiber.StatusBadRequest, MsgInvalidEmailOrPwd, nil, err)
 		} else {
 			r.l.Error(err, "http - v1 - r.u.Auth")
 			return errorResponse(c, fiber.StatusInternalServerError, "Failed to autenticate user", nil, err)
@@ -208,7 +208,7 @@ func (r *UserRoutes) auth(c *fiber.Ctx) error {
 // @Accept      json
 // @Produce     json
 // @Param       request body registerUserRequest true "User data"
-// @Success     201 {object} registerUserResponse
+// @Success     201 {object} Response{data=registerUserResponse}
 // @Failure     400 {object} Response
 // @Failure     500 {object} Response
 // @Router      /users/user/register [post]
@@ -216,13 +216,13 @@ func (r *UserRoutes) register(c *fiber.Ctx) error {
 	req := &registerUserRequest{}
 	if err := c.BodyParser(req); err != nil {
 		r.l.Error(err, "v1 - register - c.BodyParser")
-		return errorResponse(c, fiber.StatusBadRequest, "Invalid request body", nil, err)
+		return errorResponse(c, fiber.StatusBadRequest, MsgInvalidRequestBody, nil, err)
 	}
 
 	isValid, errs := validations.UniversalValidation(req)
 
 	if !isValid {
-		return errorResponse(c, fiber.StatusBadRequest, "Validation error", errs, ErrorValidationFailed)
+		return errorResponse(c, fiber.StatusBadRequest, MsgNotValid, errs, ErrorValidationFailed)
 	}
 
 	res, err := r.u.Register(
@@ -235,7 +235,7 @@ func (r *UserRoutes) register(c *fiber.Ctx) error {
 
 	if err != nil {
 		if err == usecase.ErrorUserAlreadyExists {
-			return errorResponse(c, fiber.StatusBadRequest, "User already exists", nil, err)
+			return errorResponse(c, fiber.StatusBadRequest, MsgUserAlreadyExists, nil, err)
 		} else {
 			r.l.Error(err, "http - v1 - r.u.Register")
 			return errorResponse(c, fiber.StatusInternalServerError, "Failed to create user", nil, err)

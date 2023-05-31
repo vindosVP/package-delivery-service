@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// go:swag init -g internal/controller/http/v1/router.go --output docs/swagger
+// swag init -g internal/controller/http/v1/router.go --output docs/swagger
 
 // SetupRouter -.
 // Swagger spec:
