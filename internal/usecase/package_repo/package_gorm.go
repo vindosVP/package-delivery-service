@@ -15,6 +15,7 @@ func New(db *gorm.DB) *PackageRepo {
 		db: db,
 	}
 }
+
 func (p PackageRepo) GetPackages(ownerID uuid.UUID) ([]entity.Package, error) {
 	var packages []entity.Package
 	err := p.db.Model(&entity.Package{}).Where("owner_id = ?", ownerID).Find(&packages).Error

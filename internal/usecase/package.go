@@ -17,6 +17,22 @@ func NewPackageUseCase(pr PackageRepo) *PackageUseCase {
 	}
 }
 
+func (p PackageUseCase) GetPackage(ownerID uuid.UUID, packageID uuid.UUID) (*entity.Package, error) {
+	pack, err := p.packageRepo.FindByID(packageID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrorPackageDoesNotExist
+		}
+		return nil, fmt.Errorf("PackageUsecase - GetPackage - p.packageRepo.FindByID")
+	}
+
+	if pack.OwnerID != ownerID {
+		return nil, ErrorPackageDoesNotBelongToUser
+	}
+
+	return pack, nil
+}
+
 func (p PackageUseCase) GetPackages(ownerID uuid.UUID) ([]entity.Package, error) {
 	packages, err := p.packageRepo.GetPackages(ownerID)
 	if err != nil {

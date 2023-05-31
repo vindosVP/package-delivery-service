@@ -11,7 +11,6 @@ import (
 var DB *gorm.DB
 
 func NewGorm(cfg config.DB) (*gorm.DB, error) {
-
 	dns := GenerateGormDNS(cfg)
 
 	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
@@ -32,6 +31,7 @@ func NewGorm(cfg config.DB) (*gorm.DB, error) {
 		return nil, fmt.Errorf("database - NewGorm - db.AutoMigrate: %w", err)
 	}
 	DB = db
+
 	return db, err
 }
 

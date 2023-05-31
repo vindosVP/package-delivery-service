@@ -23,6 +23,7 @@ func InitValidations() error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -40,5 +41,6 @@ func UniversalValidation(body interface{}) (bool, []*ValidationErrorResponse) {
 
 		return false, errors
 	}
+
 	return true, nil
 }
