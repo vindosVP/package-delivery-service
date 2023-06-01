@@ -15,10 +15,14 @@ type User interface {
 }
 
 type Package interface {
-	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
+	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64, status string) (*entity.Package, error)
 	Update(userID uuid.UUID, packageID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
 	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
 	GetPackage(UserID uuid.UUID, packageID uuid.UUID) (*entity.Package, error)
+}
+
+type Delivery interface {
+	Create(senderID uuid.UUID, recipientID uuid.UUID, packageID uuid.UUID, urgent bool, status string) (*entity.Delivery, error)
 }
 
 type UserRepo interface {
@@ -41,4 +45,9 @@ type PackageRepo interface {
 	FindByID(packageID uuid.UUID) (*entity.Package, error)
 	Update(pack *entity.Package) (*entity.Package, error)
 	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
+	PackageExistsByID(packageID uuid.UUID) (bool, error)
+}
+
+type DeliveryRepo interface {
+	Create(delivery *entity.Delivery) (*entity.Delivery, error)
 }

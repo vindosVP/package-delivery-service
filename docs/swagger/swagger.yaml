@@ -34,6 +34,9 @@ definitions:
       packageID:
         example: 6155c774-d1e2-4816-b7f4-52ebb949f044
         type: string
+      status:
+        example: new
+        type: string
       weight:
         example: 11.3
         type: number

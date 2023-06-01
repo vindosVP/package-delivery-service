@@ -495,6 +495,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "6155c774-d1e2-4816-b7f4-52ebb949f044"
                 },
+                "status": {
+                    "type": "string",
+                    "example": "new"
+                },
                 "weight": {
                     "type": "number",
                     "example": 11.3

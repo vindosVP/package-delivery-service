@@ -24,6 +24,7 @@ type PackageRequest struct {
 type PackageResponse struct {
 	ID      uuid.UUID `json:"packageID" example:"6155c774-d1e2-4816-b7f4-52ebb949f044"`
 	OwnerID uuid.UUID `json:"ownerID" example:"P1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6"`
+	Status  string    `json:"status" example:"new"`
 	Name    string    `json:"name" example:"Package for Moxem"`
 	Weight  float64   `json:"weight" example:"11.3"`
 	Height  float64   `json:"height" example:"15"`
@@ -86,6 +87,7 @@ func (r *PackageRoutes) getPackage(c *fiber.Ctx) error {
 		Weight:  pack.Weight,
 		Height:  pack.Height,
 		Width:   pack.Width,
+		Status:  pack.Status,
 	}
 
 	return OkResponse(c, fiber.StatusOK, "OK", res)
@@ -123,6 +125,7 @@ func (r *PackageRoutes) getPackages(c *fiber.Ctx) error {
 			Weight:  v.Weight,
 			Height:  v.Height,
 			Width:   v.Width,
+			Status:  v.Status,
 		}
 		pkgs[i] = pack
 	}
@@ -194,6 +197,7 @@ func (r *PackageRoutes) update(c *fiber.Ctx) error {
 		Weight:  pack.Weight,
 		Height:  pack.Height,
 		Width:   pack.Width,
+		Status:  pack.Status,
 	}
 
 	return OkResponse(c, fiber.StatusOK, "Package updated", res)
@@ -234,6 +238,7 @@ func (r *PackageRoutes) create(c *fiber.Ctx) error {
 		req.Weight,
 		req.Height,
 		req.Width,
+		"new",
 	)
 
 	if err != nil {
@@ -248,6 +253,7 @@ func (r *PackageRoutes) create(c *fiber.Ctx) error {
 		Weight:  pack.Weight,
 		Height:  pack.Height,
 		Width:   pack.Width,
+		Status:  pack.Status,
 	}
 
 	return OkResponse(c, fiber.StatusCreated, "Package created", res)

@@ -11,6 +11,7 @@ type Package struct {
 	Owner   User      `gorm:"foreignkey:OwnerID"`
 	OwnerID uuid.UUID `gorm:"type:uuid;not_null" json:"ownerID"`
 	Name    string    `gorm:"type:varchar(255);not_null" json:"name"`
+	Status  string    `gorm:"type:varchar(255);not_null" json:"status"`
 	Weight  float64   `gorm:"not_null" json:"weight"`
 	Height  float64   `gorm:"not_null" json:"height"`
 	Width   float64   `gorm:"not_null" json:"width"`

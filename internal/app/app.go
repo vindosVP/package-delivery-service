@@ -4,6 +4,7 @@ import (
 	"clean-architecture-service/config"
 	v1 "clean-architecture-service/internal/controller/http/v1"
 	"clean-architecture-service/internal/usecase"
+	"clean-architecture-service/internal/usecase/delivery_repo"
 	"clean-architecture-service/internal/usecase/package_repo"
 	"clean-architecture-service/internal/usecase/token_repo"
 	"clean-architecture-service/internal/usecase/user_repo"
@@ -30,6 +31,7 @@ func Run(cfg *config.Config) {
 
 	userUseCase := usecase.NewUserUseCase(user_repo.New(db), token_repo.New(db))
 	packageUseCase := usecase.NewPackageUseCase(package_repo.New(db))
+	deliveryUseCase := usecase.NewDeliveryUseCase(delivery_repo.NewDeliveryRepo(db), user_repo.New(db), package_repo.New(db))
 	handler := fiber.New()
 
 	handler.Use(fiberlog.New(fiberlog.Config{
@@ -42,7 +44,7 @@ func Run(cfg *config.Config) {
 		ContextKey: "request-id",
 	}))
 
-	v1.SetupRouter(handler, userUseCase, packageUseCase, lg)
+	v1.SetupRouter(handler, userUseCase, packageUseCase, deliveryUseCase, lg)
 
 	if err := handler.Listen(cfg.App.Port); err != nil {
 		lg.Fatal(fmt.Errorf("app - Run - handler.Listen: %w", err))
