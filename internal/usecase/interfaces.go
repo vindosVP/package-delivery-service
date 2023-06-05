@@ -15,10 +15,18 @@ type User interface {
 }
 
 type Package interface {
-	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
+	Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64, status string) (*entity.Package, error)
 	Update(userID uuid.UUID, packageID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error)
 	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
 	GetPackage(UserID uuid.UUID, packageID uuid.UUID) (*entity.Package, error)
+}
+
+type Delivery interface {
+	Create(senderID uuid.UUID, recipientID uuid.UUID, packageID uuid.UUID, urgent bool, status string) (*entity.Delivery, error)
+	SetStatus(deliveryID uuid.UUID, newStatus string) error
+	Get() ([]entity.Delivery, error)
+	GetDelivery(deliveryID uuid.UUID) (*entity.Delivery, error)
+	Update(deliveryID uuid.UUID, recipientID uuid.UUID, packageID uuid.UUID, urgent bool) (*entity.Delivery, error)
 }
 
 type UserRepo interface {
@@ -41,4 +49,14 @@ type PackageRepo interface {
 	FindByID(packageID uuid.UUID) (*entity.Package, error)
 	Update(pack *entity.Package) (*entity.Package, error)
 	GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
+	PackageExistsByID(packageID uuid.UUID) (bool, error)
+}
+
+type DeliveryRepo interface {
+	Create(delivery *entity.Delivery) (*entity.Delivery, error)
+	DeliveryExists(deliveryID uuid.UUID) (bool, error)
+	SetStatus(deliveryID uuid.UUID, newStatus string) error
+	Get() ([]entity.Delivery, error)
+	FindByID(deliveryID uuid.UUID) (*entity.Delivery, error)
+	Update(delivery *entity.Delivery) (*entity.Delivery, error)
 }

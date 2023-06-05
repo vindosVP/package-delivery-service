@@ -45,13 +45,14 @@ func (p PackageUseCase) GetPackages(ownerID uuid.UUID) ([]entity.Package, error)
 	return packages, nil
 }
 
-func (p PackageUseCase) Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64) (*entity.Package, error) {
+func (p PackageUseCase) Create(ownerID uuid.UUID, name string, weight float64, height float64, width float64, status string) (*entity.Package, error) {
 	newPack, err := p.packageRepo.Create(&entity.Package{
 		OwnerID: ownerID,
 		Name:    name,
 		Weight:  weight,
 		Height:  height,
 		Width:   width,
+		Status:  status,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("PackageUsecase - Create - p.packageRepo.Create")

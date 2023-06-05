@@ -34,6 +34,9 @@ definitions:
       packageID:
         example: 6155c774-d1e2-4816-b7f4-52ebb949f044
         type: string
+      status:
+        example: new
+        type: string
       weight:
         example: 11.3
         type: number
@@ -63,6 +66,43 @@ definitions:
     required:
     - email
     - password
+    type: object
+  v1.deliveryRequest:
+    properties:
+      packageID:
+        example: 9ebb7be6-c8fc-49a5-b941-f8090c0db7fc
+        type: string
+      recipientID:
+        example: 1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6
+        type: string
+      urgent:
+        example: true
+        type: boolean
+    required:
+    - packageID
+    - recipientID
+    - urgent
+    type: object
+  v1.deliveryResponse:
+    properties:
+      DeliveryID:
+        example: 1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6
+        type: string
+      SenderId:
+        example: 9ebb7be6-c8fc-49a5-b941-f8090c0db7fc
+        type: string
+      packageID:
+        example: 9ebb7be6-c8fc-49a5-b941-f8090c0db7fc
+        type: string
+      recipientID:
+        example: 9ebb7be6-c8fc-49a5-b941-f8090c0db7fc
+        type: string
+      status:
+        example: new
+        type: string
+      urgent:
+        example: false
+        type: boolean
     type: object
   v1.refreshAuthRequest:
     properties:
@@ -124,6 +164,14 @@ definitions:
     - lastName
     - name
     type: object
+  v1.setStatusRequest:
+    properties:
+      status:
+        example: delivered
+        type: string
+    required:
+    - status
+    type: object
   v1.updateUserRequest:
     properties:
       deliveryAddress:
@@ -177,6 +225,166 @@ info:
   title: Delivery service API
   version: "1.0"
 paths:
+  /deliveries:
+    get:
+      consumes:
+      - application/json
+      description: Returns all deliveries
+      operationId: getDeliveries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/v1.deliveryResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Get deliveries
+      tags:
+      - deliveries
+    post:
+      consumes:
+      - application/json
+      description: Creates delivery
+      operationId: create
+      parameters:
+      - description: Delivery data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.deliveryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.deliveryResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Create delivery
+      tags:
+      - deliveries
+  /deliveries/{deliveryID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns delivery by id
+      operationId: getDelivery
+      parameters:
+      - description: delivery ID
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        in: path
+        name: deliveryID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.deliveryResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Get delivery
+      tags:
+      - deliveries
+    patch:
+      consumes:
+      - application/json
+      description: Updates delivery by id
+      operationId: updateDelivery
+      parameters:
+      - description: delivery ID
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        in: path
+        name: deliveryID
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.deliveryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/v1.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/v1.deliveryResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Update delivery
+      tags:
+      - deliveries
+  /deliveries/{deliveryID}/setStatus:
+    post:
+      consumes:
+      - application/json
+      description: Sets status to delivery
+      operationId: setStatus
+      parameters:
+      - description: delivery ID
+        example: 6155c774-d1e2-4816-b7f4-52ebb949f044
+        in: path
+        name: deliveryID
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.setStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Set status
+      tags:
+      - deliveries
   /packages:
     get:
       consumes:

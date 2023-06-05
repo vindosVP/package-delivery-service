@@ -17,7 +17,7 @@ import (
 // @version     1.0
 // @host        localhost:8080
 // @BasePath    /v1
-func SetupRouter(handler *fiber.App, u usecase.User, p usecase.Package, l logger.Interface) {
+func SetupRouter(handler *fiber.App, u usecase.User, p usecase.Package, d usecase.Delivery, l logger.Interface) {
 	handler.Get("/ping", func(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusOK)
 	})
@@ -27,5 +27,6 @@ func SetupRouter(handler *fiber.App, u usecase.User, p usecase.Package, l logger
 	{
 		SetUserRoutes(h, u, l)
 		SetPackageRoutes(h, p, l)
+		SetDeliveryRoutes(h, d, l)
 	}
 }

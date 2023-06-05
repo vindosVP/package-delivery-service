@@ -9,4 +9,8 @@ var (
 	ErrorUserDoesNotExist           = errors.New("user with this id does not exist")
 	ErrorPackageDoesNotExist        = errors.New("package with this id does not exist")
 	ErrorPackageDoesNotBelongToUser = errors.New("package with this id does not belong to this user")
+	ErrorSenderDoesNotExist         = errors.New("user with this id does not exist (sender)")
+	ErrorRecipientDoesNotExist      = errors.New("user with this id does not exist (recipient)")
+	ErrorCantSendToYourself         = errors.New("can`t send to yourself")
+	ErrorDeliveryDoesNotExist       = errors.New("delivery with this id does not exist")
 )

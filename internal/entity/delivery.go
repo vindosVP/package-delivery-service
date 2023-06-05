@@ -15,5 +15,5 @@ type Delivery struct {
 	PackageID   uuid.UUID `gorm:"type:uuid;not_null" json:"packageID"`
 	Package     Package   `gorm:"foreignkey:PackageID"`
 	Urgent      bool      `gorm:"not_null" json:"urgent"`
-	Delivered   bool      `gorm:"not_null" json:"delivered"`
+	Status      string    `gorm:"type:varchar(255);not_null" json:"status"`
 }
