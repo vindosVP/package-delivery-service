@@ -9,6 +9,262 @@
     "host": "localhost:8080",
     "basePath": "/v1",
     "paths": {
+        "/deliveries": {
+            "get": {
+                "description": "Returns all deliveries",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveries"
+                ],
+                "summary": "Get deliveries",
+                "operationId": "getDeliveries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/v1.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/v1.deliveryResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates delivery",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveries"
+                ],
+                "summary": "Create delivery",
+                "operationId": "create",
+                "parameters": [
+                    {
+                        "description": "Delivery data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.deliveryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/v1.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.deliveryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/deliveries/{deliveryID}": {
+            "get": {
+                "description": "Returns delivery by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveries"
+                ],
+                "summary": "Get delivery",
+                "operationId": "getDelivery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "6155c774-d1e2-4816-b7f4-52ebb949f044",
+                        "description": "delivery ID",
+                        "name": "deliveryID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/v1.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.deliveryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates delivery by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveries"
+                ],
+                "summary": "Update delivery",
+                "operationId": "updateDelivery",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "6155c774-d1e2-4816-b7f4-52ebb949f044",
+                        "description": "delivery ID",
+                        "name": "deliveryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.deliveryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/v1.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/v1.deliveryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/deliveries/{deliveryID}/setStatus": {
+            "post": {
+                "description": "Sets status to delivery",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveries"
+                ],
+                "summary": "Set status",
+                "operationId": "setStatus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "6155c774-d1e2-4816-b7f4-52ebb949f044",
+                        "description": "delivery ID",
+                        "name": "deliveryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.setStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/packages": {
             "get": {
                 "description": "Returns user`s packages",
@@ -534,6 +790,57 @@
                 }
             }
         },
+        "v1.deliveryRequest": {
+            "type": "object",
+            "required": [
+                "packageID",
+                "recipientID",
+                "urgent"
+            ],
+            "properties": {
+                "packageID": {
+                    "type": "string",
+                    "example": "9ebb7be6-c8fc-49a5-b941-f8090c0db7fc"
+                },
+                "recipientID": {
+                    "type": "string",
+                    "example": "1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6"
+                },
+                "urgent": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "v1.deliveryResponse": {
+            "type": "object",
+            "properties": {
+                "DeliveryID": {
+                    "type": "string",
+                    "example": "1873eecd-c2d0-4aa2-a8d4-e0de232c5ac6"
+                },
+                "SenderId": {
+                    "type": "string",
+                    "example": "9ebb7be6-c8fc-49a5-b941-f8090c0db7fc"
+                },
+                "packageID": {
+                    "type": "string",
+                    "example": "9ebb7be6-c8fc-49a5-b941-f8090c0db7fc"
+                },
+                "recipientID": {
+                    "type": "string",
+                    "example": "9ebb7be6-c8fc-49a5-b941-f8090c0db7fc"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "new"
+                },
+                "urgent": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
         "v1.refreshAuthRequest": {
             "type": "object",
             "required": [
@@ -612,6 +919,18 @@
                 "name": {
                     "type": "string",
                     "example": "Vadim"
+                }
+            }
+        },
+        "v1.setStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "delivered"
                 }
             }
         },

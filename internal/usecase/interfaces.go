@@ -23,6 +23,10 @@ type Package interface {
 
 type Delivery interface {
 	Create(senderID uuid.UUID, recipientID uuid.UUID, packageID uuid.UUID, urgent bool, status string) (*entity.Delivery, error)
+	SetStatus(deliveryID uuid.UUID, newStatus string) error
+	Get() ([]entity.Delivery, error)
+	GetDelivery(deliveryID uuid.UUID) (*entity.Delivery, error)
+	Update(deliveryID uuid.UUID, recipientID uuid.UUID, packageID uuid.UUID, urgent bool) (*entity.Delivery, error)
 }
 
 type UserRepo interface {
@@ -50,4 +54,9 @@ type PackageRepo interface {
 
 type DeliveryRepo interface {
 	Create(delivery *entity.Delivery) (*entity.Delivery, error)
+	DeliveryExists(deliveryID uuid.UUID) (bool, error)
+	SetStatus(deliveryID uuid.UUID, newStatus string) error
+	Get() ([]entity.Delivery, error)
+	FindByID(deliveryID uuid.UUID) (*entity.Delivery, error)
+	Update(delivery *entity.Delivery) (*entity.Delivery, error)
 }

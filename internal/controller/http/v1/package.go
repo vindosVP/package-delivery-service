@@ -15,10 +15,10 @@ type PackageRoutes struct {
 }
 
 type PackageRequest struct {
-	Name   string  `json:"name" binding:"required"  example:"Package for Moxem"`
-	Weight float64 `json:"weight" binding:"required"  example:"11.3"`
-	Height float64 `json:"height" binding:"required"  example:"15"`
-	Width  float64 `json:"width" binding:"required"  example:"13.8"`
+	Name   string  `json:"name" binding:"required"  example:"Package for Moxem" validate:"required"`
+	Weight float64 `json:"weight" binding:"required"  example:"11.3" validate:"required"`
+	Height float64 `json:"height" binding:"required"  example:"15" validate:"required"`
+	Width  float64 `json:"width" binding:"required"  example:"13.8" validate:"required"`
 }
 
 type PackageResponse struct {
