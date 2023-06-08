@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	go build -o ./server.exe ./cmd/app
+	go build -o ./service.exe ./cmd/app
 
 .PHONY: test
 test:
