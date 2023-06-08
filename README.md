@@ -103,7 +103,7 @@ Config populates from environment variables
 | DB_NAME     | Database name                     | -             | any string             |    ✔️     |
 | DB_USER     | Username for database             | -             | any string             |    ✔️     |
 | DB_PWD      | Password for database             | -             | any string             |    ✔️     |
-| DB_SSL_MODE | Disable or enable SSL mode        | disable       | `enabled`/`disabeld`   |    ✔️     |
+| DB_SSL_MODE | Disable or enable SSL mode        | disable       | `enable`/`disable`     |    ✔️     |
 | DB_DNS      | Database DNS                      | -             | any string             |     ❌     |
 
 
